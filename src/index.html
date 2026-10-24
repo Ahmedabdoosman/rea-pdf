@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' blob: data:">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>REA PDF</title>
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../icons/icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="REA PDF">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0E2233">
+  <link rel="stylesheet" href="../node_modules/@fontsource/ibm-plex-sans-arabic/arabic-400.css">
+  <link rel="stylesheet" href="../node_modules/@fontsource/ibm-plex-sans-arabic/arabic-500.css">
+  <link rel="stylesheet" href="../node_modules/@fontsource/ibm-plex-sans-arabic/arabic-600.css">
+  <link rel="stylesheet" href="../node_modules/@fontsource/ibm-plex-sans-arabic/400.css">
+  <link rel="stylesheet" href="../node_modules/@fontsource/ibm-plex-sans-arabic/600.css">
+  <link rel="stylesheet" href="../node_modules/@fontsource/aref-ruqaa/arabic-700.css">
+  <link rel="stylesheet" href="../node_modules/@fontsource/reem-kufi/arabic-600.css">
+  <link rel="stylesheet" href="../node_modules/@fontsource/reem-kufi/latin-600.css">
+  <link rel="stylesheet" href="../node_modules/@fontsource/dancing-script/latin-700.css">
+  <link rel="stylesheet" href="../node_modules/pdfjs-dist/web/pdf_viewer.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="../node_modules/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script type="module" src="bridge.js"></script>
+  <link rel="stylesheet" href="mobile.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M8 3h11l7 7v19H8z" fill="currentColor" opacity=".25"/>
+        <path d="M8 3h11l7 7v19H8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M19 3v7h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M12 22c3-1 4-6 6-6s1 4 3 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">REA PDF</span>
+    </div>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="home" role="tab" data-i18n="tab.home"></button>
+      <button class="tab" data-tab="view" role="tab" disabled data-i18n="tab.view"></button>
+      <button class="tab" data-tab="organize" role="tab" disabled data-i18n="tab.organize"></button>
+    </nav>
+
+    <div class="doc-title" id="docTitle"></div>
+
+    <div class="top-actions">
+      <button class="lang-btn" id="btnLang" data-i18n="lang.switch" data-i18n-title="lang.switchTitle"></button>
+      <button class="icon-btn" id="btnOpen" data-i18n-title="top.open" data-icon="open"></button>
+      <button class="icon-btn" id="btnSave" data-i18n-title="top.save" data-icon="save" disabled></button>
+      <button class="icon-btn" id="btnSaveAs" data-i18n-title="top.saveAs" data-icon="saveas" disabled></button>
+      <button class="icon-btn" id="btnPrint" data-i18n-title="top.print" data-icon="print" disabled></button>
+      <button class="icon-btn" id="btnTheme" data-icon="moon"></button>
+    </div>
+  </header>
+
+  <!-- Home -->
+  <section class="screen" id="screenHome">
+    <div class="home-inner">
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon" data-icon="upload"></div>
+        <h1 data-i18n="home.welcome"></h1>
+        <p data-i18n="home.tagline"></p>
+        <button class="primary" id="btnHomeOpen" data-i18n="home.open"></button>
+        <span class="hint" data-i18n="home.drop"></span>
+      </div>
+
+      <h2 class="section-title" data-i18n="home.tools"></h2>
+      <div class="tool-grid">
+        <button class="tool-card" data-action="open"><span data-icon="open"></span><b data-i18n="card.open"></b><small data-i18n="card.openDesc"></small></button>
+        <button class="tool-card" data-action="comment"><span data-icon="comment"></span><b data-i18n="card.comment"></b><small data-i18n="card.commentDesc"></small></button>
+        <button class="tool-card" data-action="organize"><span data-icon="pages"></span><b data-i18n="card.organize"></b><small data-i18n="card.organizeDesc"></small></button>
+        <button class="tool-card" data-action="merge"><span data-icon="merge"></span><b data-i18n="card.merge"></b><small data-i18n="card.mergeDesc"></small></button>
+        <button class="tool-card" data-action="sign"><span data-icon="sign"></span><b data-i18n="card.sign"></b><small data-i18n="card.signDesc"></small></button>
+        <button class="tool-card" data-action="protect"><span data-icon="lock"></span><b data-i18n="card.protect"></b><small data-i18n="card.protectDesc"></small></button>
+        <button class="tool-card" data-action="ocr"><span data-icon="ocr"></span><b data-i18n="card.ocr"></b><small data-i18n="card.ocrDesc"></small></button>
+        <button class="tool-card" data-action="compress"><span data-icon="compress"></span><b data-i18n="card.compress"></b><small data-i18n="card.compressDesc"></small></button>
+        <button class="tool-card" data-action="export"><span data-icon="export"></span><b data-i18n="card.export"></b><small data-i18n="card.exportDesc"></small></button>
+        <button class="tool-card" data-action="images"><span data-icon="image"></span><b data-i18n="card.images"></b><small data-i18n="card.imagesDesc"></small></button>
+      </div>
+
+      <div class="recent" id="recentBox" hidden>
+        <h2 class="section-title" data-i18n="home.recent"></h2>
+        <ul id="recentList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Document view -->
+  <section class="screen" id="screenView" hidden>
+    <div class="toolbar">
+      <div class="group" id="toolGroup">
+        <div class="seg" id="toolSets">
+          <button type="button" data-set="comment" class="on" data-i18n="set.comment"></button>
+          <button type="button" data-set="secure" data-i18n="set.secure"></button>
+          <button type="button" data-set="edit" data-i18n="set.edit"></button>
+          <button type="button" data-set="forms" data-i18n="set.forms"></button>
+          <button type="button" data-set="tools" data-i18n="set.tools"></button>
+        </div>
+        <button class="tool-btn active" data-tool="select" data-i18n-title="tool.selectTitle"><span data-icon="cursor"></span><span data-i18n="tool.select"></span></button>
+        <button class="tool-btn" data-tool="hand" data-i18n-title="tool.handTitle"><span data-icon="hand"></span><span data-i18n="tool.hand"></span></button>
+        <span class="sep"></span>
+        <span class="set" data-set="comment">
+          <button class="tool-btn" data-tool="highlight" data-i18n-title="tool.highlightTitle"><span data-icon="highlight"></span><span data-i18n="tool.highlight"></span></button>
+          <button class="tool-btn" data-tool="freetext" data-i18n-title="tool.textTitle"><span data-icon="text"></span><span data-i18n="tool.text"></span></button>
+          <button class="tool-btn" data-tool="ink" data-i18n-title="tool.inkTitle"><span data-icon="pen"></span><span data-i18n="tool.ink"></span></button>
+          <button class="tool-btn" data-tool="image" data-i18n-title="tool.imageTitle"><span data-icon="image"></span><span data-i18n="tool.image"></span></button>
+          <div class="dropdown">
+            <button class="tool-btn" data-tool="stamp" data-i18n-title="tool.stampTitle"><span data-icon="stamp"></span><span data-i18n="tool.stamp"></span> ▾</button>
+            <div class="menu" id="stampMenu"></div>
+          </div>
+          <span class="sep"></span>
+          <button class="tool-btn" data-tool="note" data-i18n-title="tool.noteTitle"><span data-icon="comment"></span><span data-i18n="tool.note"></span></button>
+          <div class="dropdown">
+            <button class="tool-btn" data-tool="review" data-i18n-title="tool.reviewTitle"><span data-icon="review"></span><span data-i18n="tool.review"></span> ▾</button>
+            <div class="menu">
+              <button data-review="start" data-i18n="review.start"></button>
+              <button data-review="sync" data-i18n="review.syncMenu"></button>
+            </div>
+          </div>
+        </span>
+        <span class="set" data-set="secure" hidden>
+          <div class="dropdown">
+            <button class="tool-btn" data-tool="handsign" data-i18n-title="tool.handsignTitle"><span data-icon="sign"></span><span data-i18n="tool.handsign"></span> ▾</button>
+            <div class="menu sig-menu" id="handSignMenu"></div>
+          </div>
+          <button class="tool-btn" data-tool="certsign" data-i18n-title="tool.certsignTitle"><span data-icon="cert"></span><span data-i18n="tool.certsign"></span></button>
+          <button class="tool-btn" data-tool="verify" data-i18n-title="tool.verifyTitle"><span data-icon="shield"></span><span data-i18n="tool.verify"></span></button>
+          <button class="tool-btn" data-tool="route" data-i18n-title="tool.routeTitle"><span data-icon="route"></span><span data-i18n="tool.route"></span></button>
+          <span class="sep"></span>
+          <button class="tool-btn" data-tool="redact" data-i18n-title="tool.redactTitle"><span data-icon="redact"></span><span data-i18n="tool.redact"></span></button>
+          <div class="dropdown">
+            <button class="tool-btn" data-tool="protect" data-i18n-title="tool.protectTitle"><span data-icon="lock"></span><span data-i18n="tool.protect"></span> ▾</button>
+            <div class="menu">
+              <button data-protect="add" data-i18n="tool.protectAdd"></button>
+              <button data-protect="remove" data-i18n="tool.protectRemove"></button>
+            </div>
+          </div>
+        </span>
+        <span class="set" data-set="edit" hidden>
+          <button class="tool-btn" data-tool="edittext" data-i18n-title="edit.textTitle"><span data-icon="edittext"></span><span data-i18n="edit.text"></span></button>
+          <button class="tool-btn" data-tool="editimg" data-i18n-title="edit.imagesTitle"><span data-icon="image"></span><span data-i18n="edit.images"></span></button>
+          <span class="sep"></span>
+          <button class="tool-btn" data-tool="editundo" data-i18n-title="edit.undoTitle" disabled><span data-icon="undo"></span><span data-i18n="edit.undo"></span></button>
+        </span>
+        <span class="set" data-set="forms" hidden>
+          <button class="tool-btn active" data-tool="fieldhl" data-i18n-title="form.highlightTitle"><span data-icon="fhl"></span><span data-i18n="form.highlight"></span></button>
+          <span class="sep"></span>
+          <button class="tool-btn" data-field="text" data-i18n-title="form.type.text"><span data-icon="ftext"></span><span data-i18n="form.btn.text"></span></button>
+          <button class="tool-btn" data-field="checkbox" data-i18n-title="form.type.checkbox"><span data-icon="fcheck"></span><span data-i18n="form.btn.checkbox"></span></button>
+          <button class="tool-btn" data-field="radio" data-i18n-title="form.type.radio"><span data-icon="fradio"></span><span data-i18n="form.btn.radio"></span></button>
+          <button class="tool-btn" data-field="dropdown" data-i18n-title="form.type.dropdown"><span data-icon="fdrop"></span><span data-i18n="form.btn.dropdown"></span></button>
+          <button class="tool-btn" data-field="signature" data-i18n-title="form.type.signature"><span data-icon="fsign"></span><span data-i18n="form.btn.signature"></span></button>
+          <span class="sep"></span>
+          <button class="tool-btn" data-tool="fieldedit" data-i18n-title="form.editFieldsTitle"><span data-icon="fedit"></span><span data-i18n="form.editFields"></span></button>
+        </span>
+        <span class="set" data-set="tools" hidden>
+          <div class="dropdown">
+            <button class="tool-btn" data-tool="ocr" data-i18n-title="tool.ocrTitle"><span data-icon="ocr"></span><span data-i18n="tool.ocr"></span> ▾</button>
+            <div class="menu">
+              <button data-ocr="auto" data-i18n="tool.ocrAuto"></button>
+              <button data-ocr="all" data-i18n="tool.ocrAll"></button>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="tool-btn" data-tool="compress" data-i18n-title="tool.compressTitle"><span data-icon="compress"></span><span data-i18n="tool.compress"></span> ▾</button>
+            <div class="menu">
+              <button data-compress="low" data-i18n="compress.low"></button>
+              <button data-compress="medium" data-i18n="compress.medium"></button>
+              <button data-compress="high" data-i18n="compress.high"></button>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="tool-btn" data-tool="export" data-i18n-title="tool.exportTitle"><span data-icon="export"></span><span data-i18n="tool.export"></span> ▾</button>
+            <div class="menu">
+              <button data-export="docx" data-i18n="export.docx"></button>
+              <button data-export="txt" data-i18n="export.txt"></button>
+              <button data-export="png" data-i18n="export.png"></button>
+              <button data-export="jpg" data-i18n="export.jpg"></button>
+            </div>
+          </div>
+        </span>
+      </div>
+
+      <div class="group redact-bar" id="redactBar" hidden>
+        <span class="muted" data-i18n="redact.hint"></span>
+        <input id="redactSearch" type="search" data-i18n-placeholder="redact.searchPlaceholder">
+        <button class="ghost small" id="redactFind" data-i18n="redact.find"></button>
+        <span class="count" id="redactCount"></span>
+        <button class="ghost small" id="redactClear" data-i18n="redact.clear"></button>
+        <label class="check"><input type="checkbox" id="redactMeta" checked> <span data-i18n="redact.meta"></span></label>
+        <button class="primary small" id="redactApply" data-i18n="redact.apply"></button>
+      </div>
+
+      <div class="group" id="toolOptions">
+        <label class="opt" id="optColor" hidden><span data-i18n="opt.color"></span>
+          <span class="swatches" id="swatches"></span>
+        </label>
+        <label class="opt" id="optSize" hidden><span data-i18n="opt.size"></span>
+          <input type="range" id="sizeRange" min="1" max="40" value="3">
+        </label>
+      </div>
+
+      <div class="group nav">
+        <button class="icon-btn" id="btnPrev" data-i18n-title="nav.prev" data-icon="up"></button>
+        <input id="pageInput" class="page-input" type="text" inputmode="numeric" value="1" data-i18n-aria="nav.pageNumber">
+        <span class="muted"><span data-i18n="nav.of"></span> <span id="pageCount">0</span></span>
+        <button class="icon-btn" id="btnNext" data-i18n-title="nav.next" data-icon="down"></button>
+        <span class="sep"></span>
+        <button class="icon-btn" id="btnZoomOut" data-i18n-title="nav.zoomOut" data-icon="minus"></button>
+        <select id="zoomSelect" data-i18n-title="nav.zoom">
+          <option value="auto" data-i18n="zoom.auto"></option>
+          <option value="page-width" data-i18n="zoom.width"></option>
+          <option value="page-fit" data-i18n="zoom.fit"></option>
+          <option value="0.5">50%</option>
+          <option value="0.75">75%</option>
+          <option value="1">100%</option>
+          <option value="1.25">125%</option>
+          <option value="1.5">150%</option>
+          <option value="2">200%</option>
+          <option value="3">300%</option>
+          <option value="custom" hidden></option>
+        </select>
+        <button class="icon-btn" id="btnZoomIn" data-i18n-title="nav.zoomIn" data-icon="plus"></button>
+        <button class="icon-btn" id="btnRotateView" data-i18n-title="nav.rotateView" data-icon="rotate"></button>
+        <span class="sep"></span>
+        <div class="find">
+          <input id="findInput" type="search" data-i18n-placeholder="nav.find">
+          <span class="muted" id="findCount"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">
+          <div class="side-tabs">
+            <button type="button" data-side="pages" class="on" data-i18n="side.pages"></button>
+            <button type="button" data-side="comments"><span data-i18n="side.comments"></span> <span class="badge" id="cmCount"></span></button>
+          </div>
+          <button class="icon-btn small" id="btnToggleSidebar" data-i18n-title="side.hide" data-icon="panel"></button>
+        </div>
+        <div class="thumbs" id="thumbs"></div>
+        <div class="comments-pane" id="commentsPane" hidden></div>
+      </aside>
+      <div class="viewer-wrap">
+        <div class="viewer-bars" id="viewerBars">
+        <button class="sig-banner" id="sigBanner" hidden></button>
+        <div class="collab-bar" id="reviewBar" hidden>
+          <span data-icon="comment"></span><span id="reviewText"></span>
+          <button type="button" class="ghost small" id="reviewSync" data-i18n="review.sync"></button>
+          <button type="button" class="primary small" id="reviewPublish" data-i18n="review.publish"></button>
+        </div>
+        <div class="collab-bar" id="routeBar" hidden>
+          <span data-icon="sign"></span><span id="routeText"></span>
+          <button type="button" class="ghost small" id="routeDetails" data-i18n="route.details"></button>
+          <button type="button" class="primary small" id="routeDraft" data-i18n="route.draftNext"></button>
+        </div>
+        </div>
+        <div id="viewerContainer" dir="ltr" tabindex="0">
+          <div id="viewer" class="pdfViewer"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Organize pages -->
+  <section class="screen" id="screenOrganize" hidden>
+    <div class="toolbar">
+      <div class="group">
+        <button class="tool-btn" id="orgRotateLeft"><span data-icon="rotl"></span><span data-i18n="org.rotateLeft"></span></button>
+        <button class="tool-btn" id="orgRotateRight"><span data-icon="rotate"></span><span data-i18n="org.rotateRight"></span></button>
+        <button class="tool-btn danger" id="orgDelete"><span data-icon="trash"></span><span data-i18n="org.delete"></span></button>
+        <span class="sep"></span>
+        <button class="tool-btn" id="orgExtract"><span data-icon="extract"></span><span data-i18n="org.extract"></span></button>
+        <button class="tool-btn" id="orgInsert"><span data-icon="insert"></span><span data-i18n="org.insert"></span></button>
+        <button class="tool-btn" id="orgBlank"><span data-icon="blank"></span><span data-i18n="org.blank"></span></button>
+        <span class="sep"></span>
+        <button class="tool-btn" id="orgUndo" disabled><span data-icon="undo"></span><span data-i18n="org.undo"></span></button>
+      </div>
+      <div class="group">
+        <span class="muted" id="orgStatus"></span>
+        <label class="opt"><span data-i18n="org.previewSize"></span> <input type="range" id="orgZoom" min="100" max="320" value="170"></label>
+        <button class="ghost" id="orgSelectAll" data-i18n="org.selectAll"></button>
+        <button class="primary" id="orgApply" data-i18n="org.apply"></button>
+      </div>
+    </div>
+    <div class="org-grid" id="orgGrid"></div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="busy" id="busy" hidden><div class="spinner"></div><span id="busyText"></span></div>
+  <div id="printContainer"></div>
+  <input type="file" id="fallbackFile" accept="application/pdf" hidden>
+  <input type="file" id="imageFile" accept="image/png,image/jpeg,image/webp" hidden>
+</body>
+</html>

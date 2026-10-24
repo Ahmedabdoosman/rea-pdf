@@ -1,0 +1,49 @@
+/* REA PDF on phones (Android build only): the desktop layout, compacted for touch.
+   Tool rows scroll sideways instead of wrapping into a tall block, the page
+   thumbnails become an overlay, and dialogs use the full width. */
+:root { --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); }
+/* The document handles pinch itself (bridge/index.js); one-finger panning stays native. */
+#viewerContainer { touch-action: pan-x pan-y; }
+body { padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+@media (max-width: 820px) {
+  .topbar { height: auto; min-height: 48px; flex-wrap: wrap; gap: 6px 10px; padding: 6px 10px; }
+  .brand-name { font-size: 17px; }
+  .tabs { order: 3; width: 100%; height: 40px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { white-space: nowrap; padding-inline: 12px; }
+  .top-actions { margin-inline-start: auto; }
+  #docTitle { display: none; }
+
+  .toolbar { flex-wrap: nowrap; flex-direction: column; align-items: stretch; gap: 4px; padding: 4px 6px; }
+  .toolbar > .group { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; padding-bottom: 2px; }
+  .toolbar > .group::-webkit-scrollbar { display: none; }
+  .toolbar .set { display: contents; }
+  .toolbar .set[hidden] { display: none; }
+  .tool-btn { flex: none; min-height: 40px; padding-inline: 10px; white-space: nowrap; }
+  .seg { flex: none; margin: 0; }
+  .mobile-sets { justify-content: flex-start; }
+  .seg button { min-height: 34px; white-space: nowrap; }
+  .group.nav { justify-content: flex-start; }
+  .find input { width: 140px; }
+  .dropdown .menu { position: fixed; inset-inline: 8px; top: auto; max-height: 60vh; overflow: auto; z-index: 60; }
+
+  .sidebar { position: absolute; inset-block: 0; inset-inline-start: 0; z-index: 40; box-shadow: var(--shadow); width: min(78vw, 300px); }
+  .sidebar.wide { width: min(92vw, 360px); }
+  .workspace { position: relative; }
+
+  .home-inner { padding: 18px 14px 32px; }
+  .tool-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .tool-card { padding: 12px; }
+
+  .m-dialog, .m-dialog.wide { width: 96vw; max-height: 88vh; padding: 16px; overflow: auto; }
+  .grid2 { grid-template-columns: 1fr !important; }
+  .collab-bar, .sig-banner { flex-wrap: wrap; font-size: 12.5px; }
+  .fd-tools button, .cm-tools button { min-width: 32px; min-height: 32px; }
+  .fd-handle { width: 18px; height: 18px; right: -9px; bottom: -9px; }
+}
+
+/* Web app (iPhone): offer the share sheet from a fresh tap when Safari refused it. */
+.share-bar { position: fixed; inset-inline: 12px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 90; display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 12px; background: var(--surface); color: var(--text); box-shadow: var(--shadow); border: 1px solid var(--border); }
+.share-bar span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
