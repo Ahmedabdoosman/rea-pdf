@@ -127,6 +127,9 @@ async function openBytes(bytes, { name, path = null, dirty = false, page = null,
     return false;
   }
   const old = state.pdf;
+  // Let the viewer finish fetching the previous document's pages first: pdf.js 4.x doesn't
+  // recheck the document when a late getPage() resolves, so it would land on the new page list.
+  if (old) await Promise.race([pdfViewer.pagesPromise, new Promise((r) => setTimeout(r, 1500))]).catch(() => {});
   Object.assign(state, { pdf, name, path, review, annotDirty: false, orgStale: true, password: usedPassword ?? "", encrypted: isEncryptedBytes(bytes) });
   redactor.clear();
   if (state.tool === "redact") setTool("select");
@@ -135,16 +138,12 @@ async function openBytes(bytes, { name, path = null, dirty = false, page = null,
   pdf.annotationStorage.onSetModified = () => { state.annotDirty = true; state.orgStale = true; setDirty(true); };
   linkService.setDocument(pdf, null);
   pdfViewer.setDocument(pdf);
-  // The previous document is destroyed only once the viewer has switched over,
-  // so page requests still in flight for it don't fail.
-  const dropOld = () => { clearTimeout(dropTimer); old?.destroy(); };
-  const dropTimer = setTimeout(dropOld, 10000);
   eventBus._on("pagesinit", function init() {
     eventBus._off("pagesinit", init);
     pdfViewer.currentScaleValue = state.scaleValue || "auto";
     if (page) pdfViewer.currentPageNumber = Math.min(page, pdf.numPages);
-    setTimeout(dropOld, 500);
   });
+  old?.destroy();
   $("pageCount").textContent = pdf.numPages;
   buildThumbs(pdf);
   document.querySelectorAll(".tab[data-tab]").forEach((t) => (t.disabled = false));
